@@ -29,7 +29,6 @@ def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
     return yoko,tate
 
 
-
 def gameover(screen: pg.Surface) -> None:
     """
     画面をブラックアウトし，泣くこうかとん＋Game Overを5秒表示する。
