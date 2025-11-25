@@ -1,6 +1,7 @@
 import os
 import random
 import sys
+import time
 import pygame as pg
 
 
@@ -28,6 +29,44 @@ def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
     return yoko,tate
 
 
+
+def gameover(screen: pg.Surface) -> None:
+    """
+    画面をブラックアウトし，泣くこうかとん＋Game Overを5秒表示する。
+    """
+    black = pg.Surface((WIDTH,HEIGHT))
+    black.fill((0, 0, 0))
+    black.set_alpha(200) # 半透明黒
+    screen.blit(black,(0,0))
+
+    font = pg.font.Font(None, 80)#ゲームオーバー表示
+    txt = font.render("Game Over", True, (255, 255, 255))
+    txt_rct = txt.get_rect(center=(WIDTH//2,HEIGHT//2))
+    screen.blit(txt,txt_rct)
+
+    cry_img = pg.image.load("fig/8.png")#こうかとん画像
+    screen.blit(cry_img,[txt_rct.left-70, txt_rct.top-10])#右こうかとん
+    screen.blit(cry_img,[txt_rct.right+20, txt_rct.top-10])#左こうかとん
+
+    pg.display.update()
+
+    time.sleep(5)#5秒間表示
+
+
+def init_bb_imgs() -> tuple[list[pg.Surface],list[int]]:
+    """
+    段階的に爆弾が大きくなるsurfaceリストと加速度リストを返す。
+    """
+    bb_imgs=[]
+    for r in range(1,11):
+        bb_img=pg.Surface((20*r,20*r))
+        pg.draw.circle(bb_img,(255,0,0),(10*r,10*r),10*r)
+        bb_img.set_colorkey((0, 0, 0))
+        bb_imgs.append(bb_img)
+    bb_accs=[a for a in range(1,11)]
+    return bb_imgs,bb_accs
+
+
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -44,15 +83,15 @@ def main():
     vx, vy = +5, +5  # 爆弾の横速度，縦速度
     clock = pg.time.Clock()
     tmr = 0
+    bb_imgs,bb_accs=init_bb_imgs()
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
         if kk_rct.colliderect(bb_rct):#こうかとんと爆弾が衝突
-            print("ゲームオーバー")
+            gameover(screen)
             return
         screen.blit(bg_img, [0, 0]) 
-
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
         # if key_lst[pg.K_UP]:
@@ -76,7 +115,12 @@ def main():
             vx *= -1
         if not tate: #縦はみだし
             vy *= -1
-        bb_rct.move_ip(vx, vy)
+        avx=vx*bb_accs[min(tmr//500,9)]
+        bb_img=bb_imgs[min(tmr//500,9)]
+        avy=vy*bb_accs[min(tmr//500,9)]
+        bb_rct.width=bb_img.get_rect().width
+        bb_rct.height=bb_img.get_rect().height
+        bb_rct.move_ip(avx, avy)
         screen.blit(bb_img, bb_rct)
         pg.display.update()
         tmr += 1
