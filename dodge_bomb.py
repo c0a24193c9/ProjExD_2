@@ -53,18 +53,18 @@ def gameover(screen: pg.Surface) -> None:
     time.sleep(5)#5秒間表示
 
 
-# def init_bb_imgs() -> tuple[list[pg.Surface],list[int]]:
-#     """
-#     段階的に爆弾が大きくなるsurfaceリストと加速度リストを返す。
-#     """
-#     bb_imgs=[]
-#     for r in range(1,11):
-#         bb_img=pg.Surface((20*r,20*r))
-#         pg.draw.circle(bb_img,(255,0,0),(10*r,10*r),10*r)
-#         bb_img.set_colorkey((0, 0, 0))
-#         bb_imgs.append(bb_img)
-#     bb_accs=[a for a in range(1,11)]
-#     return bb_imgs,bb_accs
+def init_bb_imgs() -> tuple[list[pg.Surface],list[int]]:
+    """
+    段階的に爆弾が大きくなるsurfaceリストと加速度リストを返す。
+    """
+    bb_imgs=[]
+    for r in range(1,11):
+        bb_img=pg.Surface((20*r,20*r))
+        pg.draw.circle(bb_img,(255,0,0),(10*r,10*r),10*r)
+        bb_img.set_colorkey((0, 0, 0))
+        bb_imgs.append(bb_img)
+    bb_accs=[a for a in range(1,11)]
+    return bb_imgs,bb_accs
 
 
 def main():
@@ -115,12 +115,12 @@ def main():
             vx *= -1
         if not tate: #縦はみだし
             vy *= -1
-        # avx=vx*bb_accs[min(tmr//500,9)]
-        # bb_img=bb_imgs[min(tmr//500,9)]
-        # avy=vy*bb_accs[min(tmr//500,9)]
-        # bb_rct.width=bb_img.get_rect().width
-        # bb_rct.height=bb_img.get_rect().height
-        # bb_rct.move_ip(avx, avy)
+        avx=vx*bb_accs[min(tmr//500,9)]
+        bb_img=bb_imgs[min(tmr//500,9)]
+        avy=vy*bb_accs[min(tmr//500,9)]
+        bb_rct.width=bb_img.get_rect().width
+        bb_rct.height=bb_img.get_rect().height
+        bb_rct.move_ip(avx, avy)
         screen.blit(bb_img, bb_rct)
         pg.display.update()
         tmr += 1
